@@ -1,0 +1,34 @@
+application: explore4square
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: true
+
+handlers:
+- url: /stylesheets/img/(.*\.(gif|png|jpg))
+  static_files: stylesheets/img/\1
+  upload: stylesheets/img/(.*\.(gif|png|jpg))
+
+- url: /stylesheets/css
+  mime_type: text/css
+  static_dir: stylesheets/css
+
+- url: /stylesheets/js
+  mime_type: text/javascript
+  static_dir: stylesheets/js
+
+- url: /stylesheets
+  static_dir: stylesheets
+
+- url: /callbak
+  script: main.app
+
+- url: /.*
+  script: main.app
+
+
+libraries:
+- name: webapp2
+  version: latest
+- name: jinja2
+  version: latest

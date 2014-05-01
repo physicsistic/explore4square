@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block main %}
+  <div id='results' >
+  </div>
+  <script type="text/javascript" src="stylesheets/js/shenanigans.js"></script>
+  <script type="text/javascript">
+  getLocation("{{access_token}}", "{{query}}", "{{people}}");
+  </script>>
+{% endblock %}

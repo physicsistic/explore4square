@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block main %}
+<div class="container">
+	<div class="search-group">
+	<h2 >I am looking for</h2>
+	<form action="/results" method="get">
+	<div class="form-group input-group-lg">
+		<label class="sr-only" for="query">Query</label>
+		<input type="text" name='query' class="form-control" placeholder="eg. Salad" id="query">
+	</div>
+	<h2>with</h2>
+	<div class="form-group input-group-lg">
+		<label class="sr-only" for="friend">Friend</label>
+		<input type="text" name='friend' class="form-control" placeholder="eg. BFF" id="friend" {% if authenticated %} {% else %} disabled {% endif %}>
+	</div>
+	<br>
+	{% if authenticated %}
+	<button type="submit" class="btn btn-primary btn-lg" id="results-link">Let's go!</button>
+	{% else %}
+		<h4 class="bg-info" id='foursquare-warning'>
+			Connect via Foursquare to search with friends!
+			<a href="/auth" target="_blank" id='connect-foursquare-image'></a>
+		</h4>
+	{% endif %}
+
+	<br>
+	
+	</form>
+	</div>
+</div>
+	<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css">
+ 	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+ 	<script type="text/javascript" src="stylesheets/js/suggestfriend.js"></script>
+ 	<script type="text/javascript">
+ 	findFriend("{{foursquare_token}}");
+ 	</script>>
+
+{% endblock %}
+
+
