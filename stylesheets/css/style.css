@@ -1,6 +1,7 @@
 
 body {
 	padding-top: 50px;
+	height: 100%;
 	font-family: 'Titillium Web', 'sans-serif';
 }
 
@@ -12,17 +13,31 @@ body {
 	padding: 0px 5px;
 }
 #map { 
-	position:absolute; 
-	top:50px; 
-	bottom:0; 
-	width:100%; 
+	position:relative;
+	left:0px;
+	height: 100vh; 
 }
-.form-control {
-	width: 50%,
-}
+
 .center {
 	text-align: center;
 }
+
+.container-fluid.no-gutter {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.row.no-gutter {
+	margin-left: 0;
+	margin-right: 0;
+}
+
+.row.no-gutter [class*='col-']:not(:first-child),
+.row.no-gutter [class*='col-']:not(:last-child) {
+  padding-right: 0;
+  padding-left: 0;
+}
+
 
 #foursquare-warning {
 	padding: 10px 10px 10px 10px;
@@ -35,5 +50,12 @@ body {
 	width: 300px;
 	margin-left: auto;
 	margin-right: auto;
-	margin-top:5px
+	margin-top:5px;
+}
+
+#results {
+	top:50px;
+	right:0;
+	position: fixed;
+	height: 100%;
 }

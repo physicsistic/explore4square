@@ -21,6 +21,7 @@ function findPeople(foursquareAccessToken, people, venues){
         break;
       }
     }
+    console.log(friendID);
     for(var i = 0; i < venues.length; ++i) {
       var venue = venues[i];
       loadVenue(foursquareAccessToken, venue, friendID);
@@ -83,7 +84,32 @@ function loadVenue(foursquareToken, venue, friendID) {
     }
     /* If friend never been, display the marker */
     if(visited == false){
-      var image_source = venueJSON.photos.groups[0].items[0]
+      var image_source = venueJSON.photos.groups[0].items[0];
+      function getDescriptionString(){
+        if(venueJSON.description != undefined){
+          return venueJSON.description
+        }
+        else{
+          return venueJSON.phrases[0].phrase + ' &#183 ' + venueJSON.phrases[1].phrase + ' &#183 ' + venueJSON.phrases[2].phrase
+        }
+      }
+      var s = '<a href="'+ venueJSON.canonicalUrl +'" class="list-group-item">'+
+                '<div class="media">'+
+                  '<img class= "pull-left" src="'+ image_source.prefix+'width'+image_source.width+image_source.suffix +'" width="128" height="128">' +
+                  '<div class="media-body">'+
+                    '<h3 class="media-heading">'+ venueJSON.name + '</h3>' +
+                    '<h4><span class="label label-info">'+venueJSON.rating+'</span> <span class="label label-warning">'+ Array(venueJSON.price.tier+1).join("S") +'</span></h4>' +
+                    '<p class="media-text">' + getDescriptionString() + '</p>' +
+                  '</div>'+
+                '</div>'+
+              '</a>';
+      var div = document.createElement('div');
+      div.innerHTML = s;
+      var newLocation = div.firstChild;
+      var listedResults = document.getElementById('listed-results');
+      listedResults.appendChild(newLocation);
+      console.log(venueJSON);
+      
       var popupContent = '<a target="_blank" class="popup" href="' + venueJSON.canonicalUrl + '">' +
                         '<img src="' + image_source.prefix+'width'+image_source.width+image_source.suffix + '" width="200">' +
                         '<h2>' + venueJSON.name + '</h2>' +
@@ -98,6 +124,8 @@ function loadVenue(foursquareToken, venue, friendID) {
   var queryString = "https://api.foursquare.com/v2/venues/"+locationID+"?"+
                     foursquareVersion +
                     "&oauth_token="+foursquareToken;
+
+  console.log(queryString);
   oReq.open("get", queryString, true);
   oReq.send();
 
@@ -105,6 +133,7 @@ function loadVenue(foursquareToken, venue, friendID) {
 }
 
 function searchRawVenueData(foursquareToken, query, l, people) {
+  console.log(people);
   map.setView([l.latitude, l.longitude], 15)
   function reqListener () {
     var venues = (JSON.parse(this.responseText)).response.groups[0].items;
@@ -116,8 +145,9 @@ function searchRawVenueData(foursquareToken, query, l, people) {
   var queryString ="https://api.foursquare.com/v2/venues/explore?" +
                   foursquareVersion +
                   "&ll="+l.latitude+","+l.longitude +
+                  '&novelty=new'+
                   "&query="+encodeURI(query) +
-                  "&limit=50" +
+                  "&limit=10" +
                   "&openNow=1" +
                   "&oauth_token="+foursquareToken;
   rawVenueRequest.open("get", queryString, true);

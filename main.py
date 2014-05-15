@@ -8,8 +8,31 @@ import json
 import Cookie
 import datetime
 import logging
+import httplib
+from secrets import PROD as app_credentials
 
 from google.appengine.ext import ndb
+
+if 'lib' not in sys.path:
+    sys.path[0:0] = ['lib']
+
+authorize_url = 'https://foursquare.com/oauth2/authorize?'
+access_token_url = 'https://foursquare.com/oauth2/access_token?'
+api_url = 'https://api.foursquare.com/v2/'
+
+authorize_url_params = {
+    'client_id': app_credentials['client_id'], 
+    'response_type': 'code',
+    'redirect_uri': app_credentials['redirect_uri']
+}
+
+access_token_url_params = {
+    'client_id': app_credentials['client_id'], 
+    'client_secret': app_credentials['client_secret'],
+    'grant_type': 'authorization_code',
+    'redirect_uri': app_credentials['redirect_uri'],
+    'code': None
+}
 
 class Explorer(ndb.Model):
   foursquare_id = ndb.StringProperty()
@@ -30,45 +53,23 @@ def get_explorer(foursquare_id):
 
 def urlopen_error_handler(url):
     request = urllib2.Request(url)
+    print request
     try: 
         response = (urllib2.urlopen(request)).read()
         logging.info('Request sent to url: %s', url)
         return response
     except urllib2.HTTPError, e:
         logging.error('HTTPError = ' + str(e.code))
-        return None
+        return "None"
     except urllib2.URLError, e:
         logging.error('URLError = ' + str(e.reason))
-        return None
+        return "None"
     except httplib.HTTPException, e:
         logging.error('HTTPException')
-        return None
+        return "None"
     except Exception:
         logging.error('generic exception')
-        return None
-
-    if 'lib' not in sys.path:
-        sys.path[0:0] = ['lib']
-
-authorize_url = 'https://foursquare.com/oauth2/authorize?'
-access_token_url = 'https://foursquare.com/oauth2/access_token?'
-api_url = 'https://api.foursquare.com/v2/'
-
-authorize_url_params = {
-    'client_id': '2EXJ01AGMR4S3M2GLUZ4DTYXQ3XKLTLDPX03KYQIXVAV5KAH', 
-    'response_type': 'code',
-    'redirect_uri': 'http://explore4square.appspot.com/callback'
-}
-
-access_token_url_params = {
-    'client_id': '2EXJ01AGMR4S3M2GLUZ4DTYXQ3XKLTLDPX03KYQIXVAV5KAH', 
-    'client_secret': 'JOW1B4LEACF4UYDZDPOBNJRHZJ4GKTJAZ0G5NRCGJ204DBZB',
-    'grant_type': 'authorization_code',
-    'redirect_uri': 'http://explore4square.appspot.com/callback',
-    'code': None
-}
-
-access_token = None
+        return "None"
 
 # print "==================="
 
@@ -106,7 +107,6 @@ class AuthHandler(webapp2.RequestHandler):
         self.redirect(authorize_url+ urllib.urlencode(authorize_url_params))
 
 
-
 class CallbackHandler(webapp2.RequestHandler):
     def get(self):
         access_token_url_params['code'] = str(self.request.get('code'))
@@ -131,18 +131,16 @@ class CallbackHandler(webapp2.RequestHandler):
         ck = Cookie.SimpleCookie()
         ck['explorer'] = str(explorer.key.urlsafe())
         ck['explorer']['path'] = '/'
-        expires = datetime.datetime.utcnow() + datetime.timedelta(days=30) # expires in 365 days
+        expires = datetime.datetime.utcnow() + datetime.timedelta(days=365) # expires in 365 days
         ck['explorer']['expires'] = expires.strftime("%a, %d %b %Y %H:%M:%S GMT")
         try:
             self.response.headers.add_header('Set-Cookie', ck.output())
             logging.info('Cookie %s put into user browser', ck.output())
         except Exception:
             logging.error('Unable to store cookie in user browser')
-
         self.redirect('/')
 
 class ResultsHandler(webapp2.RequestHandler):
-
     def get(self):
         explorer = None
         # request cookies from user server
