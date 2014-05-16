@@ -182,4 +182,4 @@ app = webapp2.WSGIApplication([
     # ('/search', FoursquareMagicHandler),
     # (decorator.callback_path, decorator.callback_handler()),
 ],
-debug=True)
+debug=False)

@@ -106,16 +106,24 @@ function loadVenue(foursquareToken, venue, friendID) {
       var div = document.createElement('div');
       div.innerHTML = s;
       var newLocation = div.firstChild;
+      newLocation.onmouseover = showPopUp;
+
       var listedResults = document.getElementById('listed-results');
       listedResults.appendChild(newLocation);
       console.log(venueJSON);
       
-      var popupContent = '<a target="_blank" class="popup" href="' + venueJSON.canonicalUrl + '">' +
-                        '<img src="' + image_source.prefix+'width'+image_source.width+image_source.suffix + '" width="200">' +
-                        '<h2>' + venueJSON.name + '</h2>' +
-                        '</a>' +
-                        '<h1>' + venueJSON.rating + '</h1>';
+      var popupContent ='<a class="popup media" href="' + venueJSON.canonicalUrl + '">' +
+                          '<div class="media">'+
+                            '<div class="media-body">'+
+                              '<h4 class="media-heading">' + venueJSON.name  +'</h4>' +
+                            '</div>'+
+                            '<img src="' + image_source.prefix+'width'+image_source.width+image_source.suffix + '" width="128" height="128"></a>' +
+                          '</div>'+
+                        '</a>';
       var venueMarker = L.marker([venueJSON.location.lat, venueJSON.location.lng]).addTo(map).bindPopup(popupContent);
+      function showPopUp(){
+        venueMarker.openPopup();
+      };
    }
  }
 
